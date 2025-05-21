@@ -1,0 +1,130 @@
+@extends('app')
+@section('content')
+<div class="bg-white shadow rounded-lg">
+    <div class="px-4 py-5 sm:p-6">
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-900">
+                Modify Assessment for {{ $company->name }}
+            </h2>
+            <p class="text-gray-600 mt-2">
+                Update your answers to improve the assessment results
+            </p>
+        </div>
+        
+        <form action="{{ route('security.update-assessment', $company) }}" method="POST">
+            @csrf
+            @method('PUT')
+            
+
+            
+            <div class="space-y-6">
+                @foreach($questions as $index => $question)
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">
+                            {{ $index + 1 }}. {{ $question }}
+                        </h3>
+                        <div class="flex space-x-6">
+                            <label class="flex items-center">
+                                <input
+                                    type="radio"
+                                    name="answers[{{ $index }}]"
+                                    value="yes"
+                                    required
+                                    {{ isset($assessment->answers[$index]) && $assessment->answers[$index] === 'yes' ? 'checked' : '' }}
+                                    class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 question-radio"
+                                    data-answer="yes"
+                                >
+                                <span class="ml-2 text-green-700 font-medium">Yes</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input
+                                    type="radio"
+                                    name="answers[{{ $index }}]"
+                                    value="no"
+                                    required
+                                    {{ isset($assessment->answers[$index]) && $assessment->answers[$index] === 'no' ? 'checked' : '' }}
+                                    class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 question-radio"
+                                    data-answer="no"
+                                >
+                                <span class="ml-2 text-red-700 font-medium">No</span>
+                            </label>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+            
+            <div class="mt-8 flex justify-between">
+                <div class="flex space-x-4">
+                    <a
+                        href="{{ route('security.saved-companies') }}"
+                        class="bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition duration-200"
+                    >
+                        Cancel
+                    </a>
+                    <button
+                        type="button"
+                        id="toggleSelect"
+                        class="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition duration-200 text-sm font-medium"
+                    >
+                        Select All "Yes"
+                    </button>
+                    <button
+                        type="button"
+                        id="unselectAll"
+                        class="bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 transition duration-200 text-sm font-medium"
+                    >
+                        Unselect All
+                    </button>
+                </div>
+                <button
+                    type="submit"
+                    class="bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700 transition duration-200 font-medium"
+                >
+                    Update Assessment
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleBtn = document.getElementById('toggleSelect');
+    const unselectBtn = document.getElementById('unselectAll');
+    const radioButtons = document.querySelectorAll('.question-radio');
+    
+    let isSelectingYes = true;
+
+    toggleBtn.addEventListener('click', function() {
+        if (isSelectingYes) {
+            radioButtons.forEach(radio => {
+                if (radio.getAttribute('data-answer') === 'yes') {
+                    radio.checked = true;
+                }
+            });
+            toggleBtn.textContent = 'Select All "No"';
+            toggleBtn.className = 'bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition duration-200 text-sm font-medium';
+            isSelectingYes = false;
+        } else {
+            radioButtons.forEach(radio => {
+                if (radio.getAttribute('data-answer') === 'no') {
+                    radio.checked = true;
+                }
+            });
+            toggleBtn.textContent = 'Select All "Yes"';
+            toggleBtn.className = 'bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition duration-200 text-sm font-medium';
+            isSelectingYes = true;
+        }
+    });
+
+    unselectBtn.addEventListener('click', function() {
+        radioButtons.forEach(radio => {
+            radio.checked = false;
+        });
+        toggleBtn.textContent = 'Select All "Yes"';
+        toggleBtn.className = 'bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition duration-200 text-sm font-medium';
+        isSelectingYes = true;
+    });
+});
+</script>
+@endsection
